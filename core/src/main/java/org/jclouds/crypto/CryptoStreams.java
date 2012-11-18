@@ -24,13 +24,14 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 import javax.crypto.Mac;
 
-import org.jclouds.encryption.internal.Base64;
+import org.jclouds.encoding.internal.FlexBase64;
 import org.jclouds.io.InputSuppliers;
 
 import com.google.common.annotations.Beta;
@@ -75,7 +76,7 @@ public class CryptoStreams {
    }
 
    public static String base64(byte[] in) {
-      return Base64.encodeBytes(in, Base64.DONT_BREAK_LINES);
+      return new String(FlexBase64.encodeBytes(in, 0, in.length, false), Charsets.US_ASCII);
    }
    
    /**
@@ -130,7 +131,15 @@ public class CryptoStreams {
     *      encoding</a>
     */
    public static byte[] base64(String in) {
-      return Base64.decode(in);
+      try {
+         ByteBuffer buffer = FlexBase64.decode(in);
+         byte [] returnVal = new  byte [buffer.limit()];
+         System.arraycopy(buffer.array(), buffer.arrayOffset(), returnVal, 0, buffer.limit());
+         return returnVal;
+      } catch (IOException e) {
+         // unlikely as this is not reading from a stream
+         throw Throwables.propagate(e);
+      }
    }
 
    /**
