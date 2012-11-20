@@ -21,6 +21,7 @@ package org.jclouds.rest.config;
 import static org.jclouds.Constants.PROPERTY_TIMEOUTS_PREFIX;
 
 import java.lang.reflect.Method;
+import java.net.Proxy;
 import java.net.URI;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
@@ -32,6 +33,7 @@ import javax.ws.rs.core.UriBuilder;
 import org.jclouds.functions.IdentityFunction;
 import org.jclouds.http.HttpRequest;
 import org.jclouds.http.HttpResponse;
+import org.jclouds.http.ProxyForURI;
 import org.jclouds.http.TransformingHttpCommand;
 import org.jclouds.http.TransformingHttpCommandExecutorService;
 import org.jclouds.http.TransformingHttpCommandImpl;
@@ -109,6 +111,8 @@ public class RestModule extends AbstractModule {
       }).toInstance(authException);
       bind(new TypeLiteral<Function<Predicate<String>, Map<String, String>>>() {
       }).to(FilterStringsBoundToInjectorByName.class);
+      bind(new TypeLiteral<Function<URI, Proxy>>() {
+      }).to(ProxyForURI.class);
       installLocations();
    }
 
